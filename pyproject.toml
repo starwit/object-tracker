@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "objecttracker"
+version = "0.1.0"
+description = ""
+authors = ["flonix8 <flstanek@googlemail.com>"]
+license = "GPLv3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.24.3"
+pydantic = "^1.10.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
