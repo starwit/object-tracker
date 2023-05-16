@@ -128,10 +128,11 @@ class _TrackingLoop(mp.Process):
             tracked_detection.detection.bounding_box.max_x = int(pred[2])
             tracked_detection.detection.bounding_box.max_y = int(pred[3])
 
-            tracked_detection.detection.confidence = float(pred[4])
-            tracked_detection.detection.class_id = int(pred[5])
+            tracked_detection.object_id = int(pred[4]).to_bytes(4, 'big')
 
-            tracked_detection.object_id = bytes(pred[6])
+            tracked_detection.detection.class_id = int(pred[5])
+            tracked_detection.detection.confidence = float(pred[6])
+
 
 
         return output_proto.SerializeToString()
