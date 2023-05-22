@@ -1,6 +1,5 @@
 __pycache__
 .venv
-.torchwheels
 .demo_detections
 .demo_output
 cache
