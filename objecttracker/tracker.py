@@ -70,9 +70,11 @@ class _TrackingLoop(mp.Process):
             except queue.Empty:
                 time.sleep(0.01)
                 continue
-
+            
+            start = time.time()
             det_array = self._prepare_detection_input(detection_proto)
             tracking_output_array = self.tracker.update(det_array, input_image)
+            print(f'Tracking took {round(time.time() - start, 5)}s')
             
             try:
                 self.output_queue.put(self._create_output(tracking_output_array, detection_proto), block=False)
@@ -97,7 +99,8 @@ class _TrackingLoop(mp.Process):
         detection_proto.ParseFromString(detection_proto_raw)
 
         input_frame = detection_proto.frame
-        input_image = np.frombuffer(input_frame.frame_data, dtype=np.uint8).reshape(input_frame.shape)
+        input_image = np.frombuffer(input_frame.frame_data, dtype=np.uint8) \
+            .reshape((input_frame.shape.height, input_frame.shape.width, input_frame.shape.channels))
 
         return input_image, detection_proto
     

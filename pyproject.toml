@@ -12,8 +12,8 @@ numpy = "^1.24.3"
 pydantic = "^1.10.7"
 visionapi = { git = "git@github.com:starwit/vision-api.git", subdirectory = "python/visionapi", develop = true }
 opencv-python = "^4.7.0.72"
-torch = { path = ".torchwheels/torch-2.0.1+cu118-cp310-cp310-linux_x86_64.whl" }
-torchvision = { path = ".torchwheels/torchvision-0.15.2+cu118-cp310-cp310-linux_x86_64.whl" }
+torch = { url = "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp310-cp310-linux_x86_64.whl" }
+torchvision = { url = "https://download.pytorch.org/whl/cu118/torchvision-0.15.2%2Bcu118-cp310-cp310-linux_x86_64.whl" }
 ultralytics = "^8.0.103"
 gdown = "^4.7.1"
 filterpy = "^1.4.5"

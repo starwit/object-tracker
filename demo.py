@@ -28,7 +28,7 @@ def deserialize_proto(message):
 def create_output_image(track_proto: TrackingOutput):
     img_shape = track_proto.frame.shape
     img_bytes = track_proto.frame.frame_data
-    img = np.frombuffer(img_bytes, dtype=np.uint8).reshape(img_shape)
+    img = np.frombuffer(img_bytes, dtype=np.uint8).reshape((img_shape.height, img_shape.width, img_shape.channels))
 
     return annotate(img, track_proto)
 
@@ -68,7 +68,7 @@ for basename, detection in detection_iter('.demo_detections'):
     tracked_detections = MessageToDict(track_proto)['trackedDetections']
     cv2.imshow('window', create_output_image(track_proto))
     cv2.waitKey(1)
-    print(f'{basename}: {json.dumps(tracked_detections)}')
+    # print(f'{basename}: {json.dumps(tracked_detections)}')
 
 cv2.destroyAllWindows()
 
