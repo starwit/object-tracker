@@ -81,8 +81,8 @@ class _TrackingLoop(mp.Process):
             except queue.Full:
                 time.sleep(0.01)
         
-        self.input_queue.cancel_join_thread()
-        self.output_queue.cancel_join_thread()
+        self._drain_queue(self.input_queue)
+        self._drain_queue(self.output_queue)
 
     def _setup(self):
         self.tracker = OCSort(
@@ -136,6 +136,11 @@ class _TrackingLoop(mp.Process):
             tracked_detection.detection.class_id = int(pred[5])
             tracked_detection.detection.confidence = float(pred[6])
 
-
-
         return output_proto.SerializeToString()
+    
+    def _drain_queue(self, q: mp.Queue):
+        try:
+            while True:
+                q.get(block=True, timeout=1)
+        except queue.Empty:
+            pass
