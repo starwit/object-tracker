@@ -81,6 +81,7 @@ class Tracker:
             tracked_detection.detection.class_id = int(pred[5])
             tracked_detection.detection.confidence = float(pred[6])
 
+        output_proto.metrics.CopyFrom(detection_proto.metrics)
         output_proto.metrics.tracking_inference_time_us = inference_time_us
         
         return output_proto.SerializeToString()
