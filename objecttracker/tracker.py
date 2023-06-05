@@ -1,10 +1,10 @@
+import time
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
-from visionapi.detector_pb2 import DetectionOutput
-from visionapi.tracker_pb2 import TrackingOutput
+from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
 
 from .config import ObjectTrackerConfig
 from .trackingimpl.deepocsort.ocsort import OCSort
@@ -24,10 +24,12 @@ class Tracker:
 
         input_image, detection_proto = self._unpack_proto(input_proto)
         
+        inference_start = time.monotonic_ns()
         det_array = self._prepare_detection_input(detection_proto)
         tracking_output_array = self.tracker.update(det_array, input_image)
         
-        return self._create_output(tracking_output_array, detection_proto)
+        inference_time_us = (time.monotonic_ns() - inference_start) // 1000
+        return self._create_output(tracking_output_array, detection_proto, inference_time_us)
         
     def _setup(self):
         self.tracker = OCSort(
@@ -59,7 +61,7 @@ class Tracker:
             det_array[idx, 5] = detection.class_id
         return det_array
     
-    def _create_output(self, tracking_output, detection_proto: DetectionOutput):
+    def _create_output(self, tracking_output, detection_proto: DetectionOutput, inference_time_us):
         output_proto = TrackingOutput()
         output_proto.frame.CopyFrom(detection_proto.frame)
 
@@ -79,4 +81,6 @@ class Tracker:
             tracked_detection.detection.class_id = int(pred[5])
             tracked_detection.detection.confidence = float(pred[6])
 
+        output_proto.metrics.tracking_inference_time_us = inference_time_us
+        
         return output_proto.SerializeToString()

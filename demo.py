@@ -1,24 +1,24 @@
-import os
 import json
+import os
+
 import cv2
 import numpy as np
-from ultralytics.yolo.utils.plotting import Annotator
-from objecttracker.config import ObjectTrackerConfig, DeepOcSortConfig
-from objecttracker.tracker import Tracker
-from visionapi.detector_pb2 import DetectionOutput
-from visionapi.tracker_pb2 import TrackingOutput
-from google.protobuf.text_format import Parse
 from google.protobuf.json_format import MessageToDict
+from google.protobuf.text_format import Parse
+from ultralytics.yolo.utils.plotting import Annotator
+from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
+
+from objecttracker.config import DeepOcSortConfig, ObjectTrackerConfig
+from objecttracker.tracker import Tracker
 
 
 def detection_iter(path):
     files = sorted(os.listdir(path))
     for file in files:
         basename = os.path.splitext(file)[0]
-        with open(os.path.join(path, file), 'r') as f:
+        with open(os.path.join(path, file), 'rb') as f:
             content = f.read()
-        detection = Parse(content, DetectionOutput()).SerializeToString()
-        yield basename, detection
+        yield basename, content
 
 def deserialize_proto(message):
     track_output = TrackingOutput()
@@ -62,6 +62,7 @@ tracker = Tracker(TRACKING_CONFIG)
 for basename, detection in detection_iter('.demo_detections'):
     track_message = tracker.get(detection)
     track_proto = deserialize_proto(track_message)
+    print(f'Inference time: {track_proto.metrics.tracking_inference_time_us} us')
     tracked_detections = MessageToDict(track_proto)['trackedDetections']
     cv2.imshow('window', create_output_image(track_proto))
     cv2.waitKey(1)
