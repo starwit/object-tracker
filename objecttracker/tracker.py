@@ -1,3 +1,4 @@
+import logging
 import time
 from pathlib import Path
 from typing import Any
@@ -9,10 +10,14 @@ from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
 from .config import ObjectTrackerConfig
 from .trackingimpl.deepocsort.ocsort import OCSort
 
+logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(message)s')
+logger = logging.getLogger(__name__)
+
 
 class Tracker:
     def __init__(self, config: ObjectTrackerConfig) -> None:
         self.config = config
+        logger.setLevel(self.config.log_level.value)
 
         self._setup()
         
@@ -32,6 +37,7 @@ class Tracker:
         return self._create_output(tracking_output_array, detection_proto, inference_time_us)
         
     def _setup(self):
+        logger.info('Setting up object-tracker model...')
         self.tracker = OCSort(
             Path(self.config.tracking_params.model_weights), 
             torch.device(self.config.device), 

@@ -8,7 +8,7 @@ from google.protobuf.text_format import Parse
 from ultralytics.yolo.utils.plotting import Annotator
 from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
 
-from objecttracker.config import DeepOcSortConfig, ObjectTrackerConfig
+from objecttracker.config import DeepOcSortConfig, ObjectTrackerConfig, LogLevel
 from objecttracker.tracker import Tracker
 
 
@@ -50,6 +50,7 @@ def annotate(image, track_proto: TrackingOutput):
     
 
 TRACKING_CONFIG = ObjectTrackerConfig(
+    log_level=LogLevel.INFO,
     tracking_params=DeepOcSortConfig(
         det_thresh=0.25,
         model_weights='osnet_x0_25_msmt17.pt',
