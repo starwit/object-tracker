@@ -1,5 +1,6 @@
 import logging
 import time
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,7 @@ class Tracker:
         self.config = config
         logger.setLevel(self.config.log_level.value)
 
+        self.object_id_seed = uuid.uuid4()
         self._setup()
         
     def __call__(self, input_proto, *args, **kwargs) -> Any:
@@ -82,7 +84,7 @@ class Tracker:
             tracked_detection.detection.bounding_box.max_x = int(pred[2])
             tracked_detection.detection.bounding_box.max_y = int(pred[3])
 
-            tracked_detection.object_id = int(pred[4]).to_bytes(4, 'big')
+            tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
 
             tracked_detection.detection.class_id = int(pred[5])
             tracked_detection.detection.confidence = float(pred[6])

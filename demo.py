@@ -42,7 +42,7 @@ def annotate(image, track_proto: TrackingOutput):
 
         class_id = detection.detection.class_id
         conf = detection.detection.confidence
-        object_id = int.from_bytes(detection.object_id, 'big')
+        object_id = detection.object_id.hex()[:4]
 
         ann.box_label((bbox_x1, bbox_y1, bbox_x2, bbox_y2), f'ID {object_id} - {class_id} - {round(conf,2)}')
 
