@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objecttracker"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["flonix8 <flstanek@googlemail.com>"]
 license = "GPLv3"
@@ -17,6 +17,7 @@ torchvision = { url = "https://download.pytorch.org/whl/cu118/torchvision-0.15.2
 ultralytics = "^8.0.103"
 gdown = "^4.7.1"
 filterpy = "^1.4.5"
+redis = "^5.0.0"
 
 [build-system]
 requires = ["poetry-core"]

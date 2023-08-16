@@ -1,0 +1,9 @@
+.venv
+.vscode
+cache
+dist
+__pycache__
+demo.py
+*.pt
+*.md
+*.sh
