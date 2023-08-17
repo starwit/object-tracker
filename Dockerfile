@@ -4,6 +4,8 @@ FROM python:3.10-slim as build
 ADD "https://download.pytorch.org/whl/cu118/torchvision-0.15.2%2Bcu118-cp310-cp310-linux_x86_64.whl" /root/.cache/pypoetry/artifacts/8a/5a/f2/17840e3e7de0bb7049fb034c6b3404bc24827c49ebd5e893da356d42ba/
 ADD "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp310-cp310-linux_x86_64.whl" /root/.cache/pypoetry/artifacts/a8/65/bc/e9ab7708c15c5bf2697ba7610b1de40aa2ad0fafbc4780299910205883/
 
+ADD "https://drive.google.com/uc?id=1Kkx2zW89jq_NETu4u42CFZTMVD5Hwm6e" /code/osnet_x0_25_msmt17.pt
+
 RUN apt update && apt install --no-install-recommends -y \
     curl \
     git \

@@ -33,11 +33,11 @@ if __name__ == '__main__':
     # Start processing images
     while not stop_event.is_set():
         input_okay = False
-        while not input_okay:
+        while not stop_event.is_set() and not input_okay:
             result = redis_conn.xread(
                 count=1,
                 block=5000,
-                streams={f'object_detector_{CONFIG.redis.detector_id}': '$' if last_retrieved_id is None else last_retrieved_id}
+                streams={f'objectdetector:{CONFIG.redis.stream_id}': '$' if last_retrieved_id is None else last_retrieved_id}
             )
         
             if result is None or len(result) == 0:
@@ -52,4 +52,4 @@ if __name__ == '__main__':
         output_proto = tracker.get(input_proto)
 
         if output_proto is not None:
-            redis_conn.xadd(name=f'object_detector', fields={'proto_data': output_proto}, maxlen=10)
+            redis_conn.xadd(name=f'objecttracker:{CONFIG.redis.stream_id}', fields={'proto_data': output_proto}, maxlen=10)

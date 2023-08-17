@@ -26,7 +26,7 @@ class DeepOcSortConfig(BaseModel):
 class RedisConfig(BaseModel):
     host: str
     port: conint(ge=1, le=65536)
-    detector_id: str
+    stream_id: str
 
 class ObjectTrackerConfig(BaseSettings):
     log_level: LogLevel = LogLevel.WARNING
