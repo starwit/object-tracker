@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objecttracker"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = ["flonix8 <flstanek@googlemail.com>"]
 license = "GPLv3"
@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 numpy = "^1.24.3"
-pydantic = "^1.10.7"
+pydantic = "^2.0.0"
 visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "0.3.3" }
 opencv-python = "^4.7.0.72"
 torch = { url = "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp310-cp310-linux_x86_64.whl" }
@@ -18,6 +18,7 @@ ultralytics = "^8.0.103"
 gdown = "^4.7.1"
 filterpy = "^1.4.5"
 redis = "^5.0.0"
+pydantic-settings = "^2.0.3"
 
 [build-system]
 requires = ["poetry-core"]

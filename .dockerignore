@@ -7,3 +7,4 @@ demo.py
 *.pt
 *.md
 *.sh
+*.yaml

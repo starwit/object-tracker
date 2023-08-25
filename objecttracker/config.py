@@ -1,15 +1,50 @@
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Tuple
 
 import yaml
-from pydantic import BaseModel, BaseSettings, conint
+from pydantic import BaseModel, conint
+from pydantic.fields import FieldInfo
+from pydantic_settings import (BaseSettings, PydanticBaseSettingsSource,
+                               SettingsConfigDict)
 
 
-def yaml_config_settings_source(settings: BaseSettings) -> dict[str, Any]:
-    return yaml.load(Path(os.environ.get('SETTINGS_FILE', 'settings.yaml')).read_text('utf-8'), Loader=yaml.Loader)
+class YamlConfigSettingsSource(PydanticBaseSettingsSource):
+    """
+    Taken from https://docs.pydantic.dev/latest/usage/pydantic_settings/#adding-sources
+    """
 
+    def __init__(self, settings_cls: type[BaseSettings]):
+        super().__init__(settings_cls)
+        self.settings_dict = yaml.load(Path(os.environ.get('SETTINGS_FILE', 'settings.yaml')).read_text('utf-8'), Loader=yaml.Loader)
+
+    def get_field_value(
+        self, field: FieldInfo, field_name: str
+    ) -> Tuple[Any, str, bool]:
+        field_value = self.settings_dict[field_name]
+        return field_value, field_name, False
+
+    def prepare_field_value(
+        self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool
+    ) -> Any:
+        return value
+
+    def __call__(self) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
+
+        for field_name, field in self.settings_cls.model_fields.items():
+            field_value, field_key, value_is_complex = self.get_field_value(
+                field, field_name
+            )
+            field_value = self.prepare_field_value(
+                field_name, field, field_value, value_is_complex
+            )
+            if field_value is not None:
+                d[field_key] = field_value
+
+        return d
+    
 
 class LogLevel(str, Enum):
     CRITICAL = 'CRITICAL'
@@ -34,8 +69,8 @@ class ObjectTrackerConfig(BaseSettings):
     device: str
     redis: RedisConfig = None
 
-    class Config:
-        env_nested_delimiter = '__'
-        @classmethod
-        def customise_sources(cls, init_settings, env_settings, file_secret_settings):
-            return (init_settings, env_settings, yaml_config_settings_source, file_secret_settings)
+    model_config = SettingsConfigDict(env_nested_delimiter='__')
+
+    @classmethod
+    def settings_customise_sources(cls, settings_cls, init_settings, env_settings, dotenv_settings, file_secret_settings):
+        return (init_settings, env_settings, YamlConfigSettingsSource(settings_cls), file_secret_settings)
