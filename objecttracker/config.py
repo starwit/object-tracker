@@ -1,4 +1,5 @@
 import os
+from collections import defaultdict
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Tuple
@@ -17,7 +18,11 @@ class YamlConfigSettingsSource(PydanticBaseSettingsSource):
 
     def __init__(self, settings_cls: type[BaseSettings]):
         super().__init__(settings_cls)
-        self.settings_dict = yaml.load(Path(os.environ.get('SETTINGS_FILE', 'settings.yaml')).read_text('utf-8'), Loader=yaml.Loader)
+        try:
+            self.settings_dict = yaml.load(Path(os.environ.get('SETTINGS_FILE', 'settings.yaml')).read_text('utf-8'), Loader=yaml.Loader)
+        except FileNotFoundError:
+            self.settings_dict = defaultdict(lambda: None)
+            print('settings.yaml not found. Using defaults.')
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
