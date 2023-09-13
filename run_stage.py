@@ -1,6 +1,9 @@
 import signal
-import redis
 import threading
+
+from visionlib.pipeline.consumer import RedisConsumer
+from visionlib.pipeline.publisher import RedisPublisher
+
 from objecttracker.config import ObjectTrackerConfig
 from objecttracker.tracker import Tracker
 
@@ -24,32 +27,21 @@ if __name__ == '__main__':
     # Init Detector
     tracker = Tracker(CONFIG)
 
-    # Init output
-    redis_conn = redis.Redis(
-        host=CONFIG.redis.host,
-        port=CONFIG.redis.port,
-    )
+    consume = RedisConsumer(CONFIG.redis.host, CONFIG.redis.port, 
+                            stream_keys=[f'{CONFIG.redis.input_stream_prefix}:{CONFIG.redis.stream_id}'])
+    publish = RedisPublisher(CONFIG.redis.host, CONFIG.redis.port)
 
-    # Start processing images
-    while not stop_event.is_set():
-        input_okay = False
-        while not stop_event.is_set() and not input_okay:
-            result = redis_conn.xread(
-                count=1,
-                block=5000,
-                streams={f'objectdetector:{CONFIG.redis.stream_id}': '$' if last_retrieved_id is None else last_retrieved_id}
-            )
-        
-            if result is None or len(result) == 0:
+    with consume, publish:
+        for stream_id, proto_data in consume():
+            if stream_id is None:
                 continue
 
-            # These unpacking incantations are apparently necessary...
-            last_retrieved_id = result[0][1][0][0].decode('utf-8')
-            input_proto = result[0][1][0][1][b'proto_data']
+            output_proto_data = tracker.get(proto_data)
 
-            input_okay = True
+            if output_proto_data is None:
+                continue
 
-        output_proto = tracker.get(input_proto)
+            publish(f'{CONFIG.redis.output_stream_prefix}:{stream_id}', proto_data)
 
-        if output_proto is not None:
-            redis_conn.xadd(name=f'objecttracker:{CONFIG.redis.stream_id}', fields={'proto_data': output_proto}, maxlen=10)
+            if stop_event.is_set():
+                break
