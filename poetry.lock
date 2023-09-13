@@ -1665,7 +1665,7 @@ redis = "^5.0.0"
 type = "git"
 url = "https://github.com/starwit/vision-lib.git"
 reference = "HEAD"
-resolved_reference = "83d17f66ae8a856ee46c8a3a488a62f24f470b03"
+resolved_reference = "73e09a1898e9e19425b941c6b16240bd2f191720"
 subdirectory = "python"
 
 [metadata]
