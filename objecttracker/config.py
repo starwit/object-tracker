@@ -17,9 +17,9 @@ class RedisConfig(BaseModel):
 
 class ObjectTrackerConfig(BaseSettings):
     log_level: LogLevel = LogLevel.WARNING
-    tracking_params: DeepOcSortConfig = DeepOcSortConfig()
+    tracking_params: DeepOcSortConfig
     device: str = 'cpu'
-    redis: RedisConfig = RedisConfig()
+    redis: RedisConfig
 
     model_config = SettingsConfigDict(env_nested_delimiter='__')
 
