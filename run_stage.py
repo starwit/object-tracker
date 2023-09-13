@@ -33,6 +33,9 @@ if __name__ == '__main__':
 
     with consume, publish:
         for stream_id, proto_data in consume():
+            if stop_event.is_set():
+                break
+            
             if stream_id is None:
                 continue
 
@@ -42,6 +45,3 @@ if __name__ == '__main__':
                 continue
 
             publish(f'{CONFIG.redis.output_stream_prefix}:{stream_id}', proto_data)
-
-            if stop_event.is_set():
-                break
