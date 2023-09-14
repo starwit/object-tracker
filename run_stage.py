@@ -44,4 +44,4 @@ if __name__ == '__main__':
             if output_proto_data is None:
                 continue
 
-            publish(f'{CONFIG.redis.output_stream_prefix}:{stream_id}', proto_data)
+            publish(f'{CONFIG.redis.output_stream_prefix}:{stream_id}', output_proto_data)
