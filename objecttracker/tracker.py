@@ -19,6 +19,8 @@ GET_DURATION = Histogram('object_tracker_get_duration', 'The time it takes to de
                          buckets=(0.0025, 0.005, 0.0075, 0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25))
 MODEL_DURATION = Summary('object_tracker_tracker_update_duration', 'How long the tracker update takes')
 OBJECT_COUNTER = Counter('object_tracker_object_counter', 'How many objects have been tracked')
+PROTO_SERIALIZATION_DURATION = Summary('object_tracker_proto_serialization_duration', 'The time it takes to create a serialized output proto')
+PROTO_DESERIALIZATION_DURATION = Summary('object_tracker_proto_deserialization_duration', 'The time it takes to deserialize an input proto')
 
 
 class Tracker:
@@ -56,6 +58,7 @@ class Tracker:
             self.config.tracking_params.det_thresh,
         )
 
+    PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, detection_proto_raw):
         detection_proto = DetectionOutput()
         detection_proto.ParseFromString(detection_proto_raw)
@@ -78,6 +81,7 @@ class Tracker:
             det_array[idx, 5] = detection.class_id
         return det_array
     
+    PROTO_SERIALIZATION_DURATION.time()
     def _create_output(self, tracking_output, detection_proto: DetectionOutput, inference_time_us):
         output_proto = TrackingOutput()
         output_proto.frame.CopyFrom(detection_proto.frame)
