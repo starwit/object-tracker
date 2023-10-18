@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from prometheus_client import Counter, Histogram, Summary
 from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
+from visionlib.pipeline.tools import get_raw_frame_data
 
 from .config import ObjectTrackerConfig
 from .trackingimpl.deepocsort.ocsort import OCSort
@@ -64,8 +65,7 @@ class Tracker:
         detection_proto.ParseFromString(detection_proto_raw)
 
         input_frame = detection_proto.frame
-        input_image = np.frombuffer(input_frame.frame_data, dtype=np.uint8) \
-            .reshape((input_frame.shape.height, input_frame.shape.width, input_frame.shape.channels))
+        input_image = get_raw_frame_data(input_frame)
 
         return input_image, detection_proto
     
