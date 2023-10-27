@@ -1,17 +1,17 @@
 [tool.poetry]
 name = "objecttracker"
-version = "0.5.0"
+version = "0.7.0"
 description = ""
 authors = ["flonix8 <flstanek@googlemail.com>"]
 license = "GPLv3"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "~3.10"
 numpy = "^1.24.3"
 pydantic = "^2.0.0"
-visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "0.3.3" }
-visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python" }
+visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "0.4.0" }
+visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.2.0" }
 opencv-python = "^4.7.0.72"
 torch = { url = "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp310-cp310-linux_x86_64.whl" }
 torchvision = { url = "https://download.pytorch.org/whl/cu118/torchvision-0.15.2%2Bcu118-cp310-cp310-linux_x86_64.whl" }
@@ -20,6 +20,7 @@ gdown = "^4.7.1"
 filterpy = "^1.4.5"
 redis = "^5.0.0"
 pydantic-settings = "^2.0.3"
+prometheus-client = "^0.17.1"
 
 [build-system]
 requires = ["poetry-core"]

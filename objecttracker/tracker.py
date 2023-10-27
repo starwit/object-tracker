@@ -6,13 +6,22 @@ from typing import Any
 
 import numpy as np
 import torch
+from prometheus_client import Counter, Histogram, Summary
 from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
+from visionlib.pipeline.tools import get_raw_frame_data
 
 from .config import ObjectTrackerConfig
 from .trackingimpl.deepocsort.ocsort import OCSort
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
+
+GET_DURATION = Histogram('object_tracker_get_duration', 'The time it takes to deserialize the proto until returning the detection result as a serialized proto',
+                         buckets=(0.0025, 0.005, 0.0075, 0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25))
+MODEL_DURATION = Summary('object_tracker_tracker_update_duration', 'How long the tracker update takes')
+OBJECT_COUNTER = Counter('object_tracker_object_counter', 'How many objects have been tracked')
+PROTO_SERIALIZATION_DURATION = Summary('object_tracker_proto_serialization_duration', 'The time it takes to create a serialized output proto')
+PROTO_DESERIALIZATION_DURATION = Summary('object_tracker_proto_deserialization_duration', 'The time it takes to deserialize an input proto')
 
 
 class Tracker:
@@ -26,6 +35,7 @@ class Tracker:
     def __call__(self, input_proto, *args, **kwargs) -> Any:
         return self.get(input_proto)
 
+    @GET_DURATION.time()
     @torch.no_grad()
     def get(self, input_proto):        
 
@@ -34,6 +44,8 @@ class Tracker:
         inference_start = time.monotonic_ns()
         det_array = self._prepare_detection_input(detection_proto)
         tracking_output_array = self.tracker.update(det_array, input_image)
+
+        OBJECT_COUNTER.inc(len(tracking_output_array))
         
         inference_time_us = (time.monotonic_ns() - inference_start) // 1000
         return self._create_output(tracking_output_array, detection_proto, inference_time_us)
@@ -47,13 +59,13 @@ class Tracker:
             self.config.tracking_params.det_thresh,
         )
 
+    PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, detection_proto_raw):
         detection_proto = DetectionOutput()
         detection_proto.ParseFromString(detection_proto_raw)
 
         input_frame = detection_proto.frame
-        input_image = np.frombuffer(input_frame.frame_data, dtype=np.uint8) \
-            .reshape((input_frame.shape.height, input_frame.shape.width, input_frame.shape.channels))
+        input_image = get_raw_frame_data(input_frame)
 
         return input_image, detection_proto
     
@@ -69,6 +81,7 @@ class Tracker:
             det_array[idx, 5] = detection.class_id
         return det_array
     
+    PROTO_SERIALIZATION_DURATION.time()
     def _create_output(self, tracking_output, detection_proto: DetectionOutput, inference_time_us):
         output_proto = TrackingOutput()
         output_proto.frame.CopyFrom(detection_proto.frame)
