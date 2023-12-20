@@ -354,7 +354,7 @@ class KalmanFilterNew(object):
             Optional process noise matrix; a value of None will cause the
             filter to use `self.Q`.
         """
-
+        
         if B is None:
             B = self.B
         if F is None:
@@ -363,6 +363,7 @@ class KalmanFilterNew(object):
             Q = self.Q
         elif isscalar(Q):
             Q = eye(self.dim_x) * Q
+        
 
         # x = Fx + Bu
         if B is not None and u is not None:
@@ -449,6 +450,7 @@ class KalmanFilterNew(object):
             w2 = np.sqrt(s2 * r2)
             h2 = np.sqrt(s2 / r2)
             time_gap = index2 - index1
+
             dx = (x2 - x1) / time_gap
             dy = (y2 - y1) / time_gap
             dw = (w2 - w1) / time_gap
@@ -495,6 +497,7 @@ class KalmanFilterNew(object):
             Optionally provide H to override the measurement function for this
             one call, otherwise self.H will be used.
         """
+
         # set to None to force recompute
         self._log_likelihood = None
         self._likelihood = None

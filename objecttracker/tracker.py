@@ -40,15 +40,19 @@ class Tracker:
     def get(self, input_proto):        
 
         input_image, detection_proto = self._unpack_proto(input_proto)
-        
+    
         inference_start = time.monotonic_ns()
         det_array = self._prepare_detection_input(detection_proto)
+
         tracking_output_array = self.tracker.update(det_array, input_image)
 
         OBJECT_COUNTER.inc(len(tracking_output_array))
         
         inference_time_us = (time.monotonic_ns() - inference_start) // 1000
-        return self._create_output(tracking_output_array, detection_proto, inference_time_us)
+
+        num_cars = len(det_array)
+
+        return self._create_output(tracking_output_array, detection_proto, inference_time_us, num_cars)
         
     def _setup(self):
         logger.info('Setting up object-tracker model...')
@@ -82,7 +86,7 @@ class Tracker:
         return det_array
     
     PROTO_SERIALIZATION_DURATION.time()
-    def _create_output(self, tracking_output, detection_proto: DetectionOutput, inference_time_us):
+    def _create_output(self, tracking_output, detection_proto: DetectionOutput, inference_time_us, num_cars):
         output_proto = TrackingOutput()
         output_proto.frame.CopyFrom(detection_proto.frame)
 
@@ -105,4 +109,4 @@ class Tracker:
         output_proto.metrics.CopyFrom(detection_proto.metrics)
         output_proto.metrics.tracking_inference_time_us = inference_time_us
         
-        return output_proto.SerializeToString()
+        return output_proto.SerializeToString(), num_cars, inference_time_us
