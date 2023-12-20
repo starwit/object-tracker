@@ -9,4 +9,4 @@ fi
 
 export GIT_CREDENTIALS="https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com"
 
-docker build --secret id=GIT_CREDENTIALS -t docker.internal.starwit-infra.de/sae/object-tracker:$(poetry version --short) .
+docker build --secret id=GIT_CREDENTIALS -t starwitorg/sae-object-tracker:$(poetry version --short) .
