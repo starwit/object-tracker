@@ -7,3 +7,4 @@ cache
 .vscode
 *.yaml
 !settings.template.yaml
+*.sh

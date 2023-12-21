@@ -334,6 +334,16 @@ six = "*"
 tqdm = "*"
 
 [[package]]
+name = "glob2"
+version = "0.7"
+description = "Version of the glob module that can capture patterns and supports recursive wildcards"
+optional = false
+python-versions = "*"
+files = [
+    {file = "glob2-0.7.tar.gz", hash = "sha256:85c3dbd07c8aa26d63d7aacee34fa86e9a91a3873bc30bf62ec46e531f92ab8c"},
+]
+
+[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -1690,4 +1700,4 @@ subdirectory = "python"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "70f4623592ff26321451d3505ed7f07b067ad3b74e22a340c31b9b8d0f8f4ef8"
+content-hash = "d6d238e9e8d6ba01d2c260e2cb84db15567dd38e163bb13db231ff000dc9c0e0"
