@@ -13,9 +13,6 @@ def scrape_and_analyze_csv_files(folder_path):
         # Read the CSV file
 
         data = pd.read_csv(file)
-        print(data['time_in_us'].astype("int").mean())
-
-
 
         # Calculate the required statistics
 

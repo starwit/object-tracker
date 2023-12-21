@@ -43,7 +43,7 @@ if __name__ == '__main__':
     counter = 0
 
     sw_version = "original_script"
-    file_name = "0-7_cores"
+    file_name = "1_core"
 
     # prepare output file
     with open(f'benchmarks/{sw_version}/{file_name}.csv','a') as f:
