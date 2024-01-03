@@ -8,3 +8,4 @@ cache
 *.yaml
 !settings.template.yaml
 *.sh
+**/frames/

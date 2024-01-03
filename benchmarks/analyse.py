@@ -2,6 +2,7 @@ import pandas as pd
 
 def analyse_csv(sw_version, file_name):
     data = pd.read_csv(f"benchmarks/{sw_version}/{file_name}.csv")
+    #data = pd.read_csv(f"{sw_version}/{file_name}.csv")
 
     # Calculate the required statistics
 
@@ -15,5 +16,3 @@ def analyse_csv(sw_version, file_name):
 
 
     print(f"\nmean:{mean_time}, standard_dev: {std_dev}, min: {min_time}, max: {max_time}")
-
-

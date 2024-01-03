@@ -5,7 +5,9 @@ import pybase64
 from objecttracker.config import ObjectTrackerConfig
 from objecttracker.tracker import Tracker
 
-from benchmarks.plot import plot
+from save_annotated_frames import save_as_image
+
+from benchmarks.plot import plot_time, plot_time_num_cars
 from benchmarks.analyse import analyse_csv
 
 from visionlib.pipeline.publisher import RedisPublisher
@@ -30,10 +32,22 @@ def read_messages(file: TextIO):
         else:
             buffer += chunk
 
+def init_output(sw_version, file_name):
+    with open(f'benchmarks/{sw_version}/{file_name}.csv','a') as fd:
+        fd.write("Frame,num_cars,time_in_us\n")
+
+def log_frame(sw_version, file_name):
+     #write data to csv_file
+    with open(f'benchmarks/{sw_version}/{file_name}.csv','a') as fd:
+        fd.write(f'{counter}, {num_cars}, {inference_time}\n')
+
 
 if __name__ == '__main__':
+    timer = time.time()
     CONFIG = ObjectTrackerConfig()
-    tracker = Tracker(CONFIG)
+
+    tracker = "boxmot_botsort"
+    tracker = Tracker(CONFIG, tracker)
 
     publish = RedisPublisher(CONFIG.redis.host, CONFIG.redis.port)
 
@@ -42,12 +56,14 @@ if __name__ == '__main__':
 
     counter = 0
 
-    sw_version = "original_script"
-    file_name = "1_core"
+    save_frame_images = True
+    bench = False
 
-    # prepare output file
-    with open(f'benchmarks/{sw_version}/{file_name}.csv','a') as f:
-        f.write('Frame,num_cars,time_in_us\n')
+    sw_version = "boxmot/botsort"
+    file_name = "performance_cores"
+
+    if bench:
+        init_output(sw_version, file_name)
 
 
     with publish, open("../vision-pipeline-k8s/tools/2023-12-13T12-22-43+0100.saedump", 'r') as input_file:
@@ -67,15 +83,17 @@ if __name__ == '__main__':
                 counter += 1
                 #print(counter)
                 
-                # write data to csv_file
-                with open(f'benchmarks/{sw_version}/{file_name}.csv','a') as fd:
-                    fd.write(f'{counter}, {num_cars}, {inference_time}\n')
+                if bench:
+                    log_frame(sw_version, file_name)
             
-
-
-                with REDIS_PUBLISH_DURATION.time():
-                    publish(f'{CONFIG.redis.output_stream_prefix}:{"test_stream"}', output_proto_data)   
+                #with REDIS_PUBLISH_DURATION.time():
+                    #publish(f'{CONFIG.redis.output_stream_prefix}:{"test_stream"}', output_proto_data)   
+                
+                if save_frame_images:
+                    save_as_image(f"benchmarks/{sw_version}/frames/", output_proto_data, counter)
                     
-
-    plot(sw_version, file_name)
-    analyse_csv(sw_version, file_name)
+    if bench:
+        plot_time(sw_version, file_name)
+        plot_time_num_cars(sw_version, file_name)
+        analyse_csv(sw_version, file_name)
+    

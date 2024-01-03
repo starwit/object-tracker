@@ -11,7 +11,7 @@ from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
 from visionlib.pipeline.tools import get_raw_frame_data
 
 from .config import ObjectTrackerConfig
-from .trackingimpl.deepocsort.ocsort import OCSort
+
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
@@ -25,11 +25,12 @@ PROTO_DESERIALIZATION_DURATION = Summary('object_tracker_proto_deserialization_d
 
 
 class Tracker:
-    def __init__(self, config: ObjectTrackerConfig) -> None:
+    def __init__(self, config: ObjectTrackerConfig, cur_tracker="deepocsort") -> None:
         self.config = config
         logger.setLevel(self.config.log_level.value)
 
         self.object_id_seed = uuid.uuid4()
+        self.cur_tracker = cur_tracker
         self._setup()
         
     def __call__(self, input_proto, *args, **kwargs) -> Any:
@@ -38,7 +39,6 @@ class Tracker:
     @GET_DURATION.time()
     @torch.no_grad()
     def get(self, input_proto):        
-
         input_image, detection_proto = self._unpack_proto(input_proto)
     
         inference_start = time.monotonic_ns()
@@ -55,13 +55,57 @@ class Tracker:
         return self._create_output(tracking_output_array, detection_proto, inference_time_us, num_cars)
         
     def _setup(self):
-        logger.info('Setting up object-tracker model...')
-        self.tracker = OCSort(
-            Path(self.config.tracking_params.model_weights), 
-            torch.device(self.config.device), 
-            self.config.tracking_params.fp16, 
-            self.config.tracking_params.det_thresh,
-        )
+        
+            
+        if self.cur_tracker == "boxmot_ocsort":
+            logger.info('Setting up object-tracker Boxmot: OCSort')
+
+            from boxmot.trackers.ocsort.ocsort import OCSort
+            self.tracker = OCSort()
+            
+
+        elif self.cur_tracker == "boxmot_botsort":
+            logger.info('Setting up object-tracker Boxmot: BotSort')
+
+            from boxmot.trackers.botsort.bot_sort import BoTSORT
+            self.tracker = BoTSORT(
+                Path(self.config.tracking_params.model_weights), 
+                torch.device(self.config.device), 
+                self.config.tracking_params.fp16
+                )
+       
+        
+        elif self.cur_tracker == "boxmot_bytetrack":
+            logger.info('Setting up object-tracker Boxmot: Bytetrack')
+
+            from boxmot.trackers.bytetrack.byte_tracker import BYTETracker
+            self.tracker = BYTETracker(
+                frame_rate=5
+                )
+            
+            
+        elif self.cur_tracker == "boxmot_deepocsort":
+            logger.info('Setting up object-tracker Boxmot: DeepOCSort')
+
+            from boxmot.trackers.deepocsort.deep_ocsort import DeepOCSort
+            self.tracker = DeepOCSort(
+                Path(self.config.tracking_params.model_weights), 
+                torch.device(self.config.device), 
+                self.config.tracking_params.fp16
+                )
+        
+        else:
+            logger.info('Setting up object-tracker DeepOCSort')
+
+            from .trackingimpl.deepocsort.ocsort import OCSort
+            self.tracker = OCSort(
+                Path(self.config.tracking_params.model_weights), 
+                torch.device(self.config.device), 
+                self.config.tracking_params.fp16, 
+                self.config.tracking_params.det_thresh,
+            )
+        
+        
 
     PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, detection_proto_raw):
@@ -104,8 +148,12 @@ class Tracker:
             tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
 
             tracked_detection.detection.class_id = int(pred[5])
-            tracked_detection.detection.confidence = float(pred[6])
 
+            if "boxmot" in self.cur_tracker:
+                tracked_detection.detection.confidence = float(pred[5])
+            else:
+                tracked_detection.detection.confidence = float(pred[6])
+  
         output_proto.metrics.CopyFrom(detection_proto.metrics)
         output_proto.metrics.tracking_inference_time_us = inference_time_us
         
