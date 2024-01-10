@@ -45,6 +45,7 @@ class Tracker:
         det_array = self._prepare_detection_input(detection_proto)
 
         tracking_output_array = self.tracker.update(det_array, input_image)
+        #print(tracking_output_array)
 
         OBJECT_COUNTER.inc(len(tracking_output_array))
         

@@ -28,17 +28,21 @@ def scrape_and_analyze_csv_files(folder_path):
 
         max_time = data['time_in_us'].astype('int').max()
 
-
-
         file_name = os.path.basename(file)[:-4]
+
+        cut_string = lambda s: s.rpartition('_')[0]
+        cores = cut_string(file_name)
+        if cores == "performance":
+            cores = "0-7"
         
 
         if "boxmot" in file:
             algorithm = os.path.normpath(file).split(os.sep)[1]
-            results = pd.concat([results, pd.DataFrame([["boxmot", algorithm, file_name, mean_time, std_dev, min_time, max_time]])], ignore_index=True)
+            
+            results = pd.concat([results, pd.DataFrame([["boxmot", algorithm, cores, mean_time, std_dev, min_time, max_time]])], ignore_index=True)
 
         else:
-            results = pd.concat([results, pd.DataFrame([["original_script", "deepocsort", file_name, mean_time, std_dev, min_time, max_time]])], ignore_index=True)
+            results = pd.concat([results, pd.DataFrame([["original_script", "deepocsort", cores, mean_time, std_dev, min_time, max_time]])], ignore_index=True)
 
     results.columns = ["Source", "Algorithm",'Cores', 'mean', 'std_dev', 'min_time', 'max_time']
     results = results.sort_values('mean')

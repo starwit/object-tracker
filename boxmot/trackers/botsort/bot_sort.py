@@ -396,7 +396,7 @@ class BoTSORT(object):
         outputs = []
         for t in output_stracks:
             output = []
-            if t.xyxy[0] < 0:
+            if np.any(t.xyxy < 0):
                 new_xyxy = [0, 0, 0, 0]
                 output.extend(new_xyxy)
             else:

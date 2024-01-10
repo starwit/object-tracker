@@ -43,7 +43,7 @@ if __name__ == '__main__':
     logger.info(f'Starting object tracker stage. Config: {CONFIG.model_dump_json(indent=2)}')
 
     # Init Detector
-    tracker = Tracker(CONFIG)
+    tracker = Tracker(CONFIG, "boxmot_ocsort")
 
     consume = RedisConsumer(CONFIG.redis.host, CONFIG.redis.port, 
                             stream_keys=[f'{CONFIG.redis.input_stream_prefix}:{CONFIG.redis.stream_id}'])
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
             FRAME_COUNTER.inc()
 
-            output_proto_data = tracker.get(proto_data)
+            output_proto_data, num_cars, inference_time = tracker.get(proto_data)
 
             if output_proto_data is None:
                 continue
