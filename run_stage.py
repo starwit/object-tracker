@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
             FRAME_COUNTER.inc()
 
-            output_proto_data, num_cars, inference_time = tracker.get(proto_data)
+            output_proto_data, num_cars, inference_time, tracking_output = tracker.get(proto_data)
 
             if output_proto_data is None:
                 continue

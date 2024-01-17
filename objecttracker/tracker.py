@@ -158,4 +158,4 @@ class Tracker:
         output_proto.metrics.CopyFrom(detection_proto.metrics)
         output_proto.metrics.tracking_inference_time_us = inference_time_us
         
-        return output_proto.SerializeToString(), num_cars, inference_time_us
+        return output_proto.SerializeToString(), num_cars, inference_time_us, tracking_output

@@ -1,3 +1,4 @@
+import argparse
 from typing import TextIO
 import time
 import pybase64
@@ -10,12 +11,15 @@ from save_annotated_frames import save_as_image
 from benchmarks.plot import plot_time, plot_time_num_cars
 from benchmarks.analyse import analyse_csv
 
+from benchmark_accuracy import convert_output_to_json, accuracy
+
 from visionlib.pipeline.publisher import RedisPublisher
 from prometheus_client import Histogram
 
 import sys
 sys.path.insert(1, '../vision-pipeline-k8s/tools')
 from common import MESSAGE_SEPARATOR, DumpMeta, Event
+
 
 
 
@@ -50,25 +54,44 @@ if __name__ == '__main__':
 
     REDIS_PUBLISH_DURATION = Histogram('object_tracker_redis_publish_duration', 'The time it takes to push a message onto the Redis stream',
                                    buckets=(0.0025, 0.005, 0.0075, 0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25))
-    
+    """
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('-t', '--tracker', type=str, required=True, choices=["bytetrack", "botsort", "ocsort", "deepocsort", "deepocsort_og"])
+    arg_parser.add_argument('-o', '--output', help='Choose an output filename (For benchmarking time only), default = [name_of_tracker_time], output path is /benchmarks/[name of tracker]/')
+    arg_parser.add_argument('-s', '--save-output', action='store_true', help='Stores the output as images in /benchmarks/[name_of_tracker]/frames')
+    arg_parser.add_argument('--benchmark-time', action='store_true')
+    arg_parser.add_argument('--benchmark-accuracy', action='store_true')
+    args = arg_parser.parse_args()
+    """
 
-    chosen_tracker = "deepocsort"
-    sw_version = "original_script"
+    chosen_tracker = "boxmot_bytetrack"
+    sw_version = "boxmot/bytetrack"
     file_name = "0-7_cores"
+
+    label_json_path = "benchmarks/accuracy/labels_CAM-HAZELDELL-126THST.json"
+    video_path = "benchmarks/accuracy/CAM-HAZELDELL-126THST_25fps.mp4"
 
     tracker = Tracker(CONFIG, chosen_tracker)
 
     frame_counter = 0
+    real_frame_counter = 0
 
     save_frame_images = False
-    bench = False
+    benchmark_time = False
+    save_tracking_output = False
+    benchmark_acccuracy = True
 
-    if bench:
+    if benchmark_time:
         init_output(sw_version, file_name)
 
+    if benchmark_acccuracy:
+        saved_matchings = dict()
+        counter = {"lost_frames": 0, "id_switches": 0}
+        saved_matchings["counter"] = counter
 
-    #with publish, open("../vision-pipeline-k8s/tools/2023-12-13T12-22-43+0100.saedump", 'r') as input_file:
-    with publish, open("../vision-pipeline-k8s/tools/2024-01-10T16-45-03+0100.saedump", 'r') as input_file:
+
+    #with publish, open("../vision-pipeline-k8s/tools/2023-04-30_RangelineSMedicalDr_short_detections.saedump", 'r') as input_file:
+    with publish, open("../vision-pipeline-k8s/tools/CAM-HAZELDELL-126THST_5fps_v3_detections.saedump", 'r') as input_file:
         
             message_reader = read_messages(input_file)
 
@@ -78,29 +101,48 @@ if __name__ == '__main__':
 
 
             for message in message_reader:
-                
-                if frame_counter == 355:
+
+                frame_counter += 1
+                #print(frame_counter)
+
+                if frame_counter < 106:
+                    continue
+
+                if frame_counter == 461:
+                # if frame_counter == 190:
                     break
+
+                real_frame_counter += 1
+                #print(real_frame_counter)
 
                 event = Event.model_validate_json(message)
                 proto_bytes = pybase64.standard_b64decode(event.data_b64)
 
-                output_proto_data, num_cars, inference_time = tracker.get(proto_bytes)
+                output_proto_data, num_cars, inference_time, tracking_output = tracker.get(proto_bytes)
 
-                frame_counter += 1
-                print(frame_counter)
                 
-                if bench:
+                if benchmark_time:
                     log_frame(sw_version, file_name)
+                
+                if benchmark_acccuracy:
+                    saved_matchings = accuracy(tracking_output, saved_matchings, (real_frame_counter - 1) * 5, label_json_path, video_path, save = False)
             
                 #with REDIS_PUBLISH_DURATION.time():
                     #publish(f'{CONFIG.redis.output_stream_prefix}:{"test_stream"}', output_proto_data)   
                 
                 if save_frame_images:
-                    save_as_image(f"benchmarks/{sw_version}/frames_new/", output_proto_data, frame_counter)
+                    save_as_image(f"benchmarks/{sw_version}/frames_hazeldell_126thst/", output_proto_data, real_frame_counter)
+
+                """
+                if save_tracking_output:
+                    print(convert_output_to_json(tracking_output))
+                """
                     
-    if bench:
+    if benchmark_time:
         plot_time(sw_version, file_name)
         plot_time_num_cars(sw_version, file_name)
         analyse_csv(sw_version, file_name)
+
+    if benchmark_acccuracy:
+        print(saved_matchings["counter"])
     
