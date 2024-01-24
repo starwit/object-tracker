@@ -1,8 +1,0 @@
-57 - 59, rechts schwarz weg, id bleibt
-69 - 72, oben weiß weg, id bleibt
-96 - ..., links unten schwarz weg, verschwindet komplett
-121 - 126, ID579C, neue id, wird nicht als auto erkannt?
-188 -190, ID87d9, neue id
-226, ID20cf, neue id (nach nur einem frame?)
-244 - 247, ID4d10, neue id aber schon raus gefahren
-
