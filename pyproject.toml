@@ -15,7 +15,8 @@ visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = 
 opencv-python = "^4.7.0.72"
 torch = { url = "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp310-cp310-linux_x86_64.whl" }
 torchvision = { url = "https://download.pytorch.org/whl/cu118/torchvision-0.15.2%2Bcu118-cp310-cp310-linux_x86_64.whl" }
-ultralytics = "^8.0.103"
+# ultralytics = "^8.0.103"
+ultralytics = "8.0.109"
 gdown = "^4.7.1"
 filterpy = "^1.4.5"
 redis = "^5.0.0"

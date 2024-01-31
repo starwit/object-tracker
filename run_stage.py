@@ -42,8 +42,8 @@ if __name__ == '__main__':
 
     logger.info(f'Starting object tracker stage. Config: {CONFIG.model_dump_json(indent=2)}')
 
-    # Init Detector
-    tracker = Tracker(CONFIG, "boxmot_ocsort")
+    # Init Tracker
+    tracker = Tracker(CONFIG, "deepocsort_og")
 
     consume = RedisConsumer(CONFIG.redis.host, CONFIG.redis.port, 
                             stream_keys=[f'{CONFIG.redis.input_stream_prefix}:{CONFIG.redis.stream_id}'])

@@ -42,7 +42,6 @@ class Tracker:
     @torch.no_grad()
     def get(self, input_proto):
         input_image, detection_proto = self._unpack_proto(input_proto)
-
         inference_start = time.monotonic_ns()
         det_array = self._prepare_detection_input(detection_proto)
 
@@ -144,16 +143,18 @@ class Tracker:
             tracked_detection.detection.bounding_box.max_x = int(pred[2])
             tracked_detection.detection.bounding_box.max_y = int(pred[3])
 
-            tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
-
-            tracked_detection.detection.class_id = int(pred[5])
-
-            if "boxmot" in self.cur_tracker:
+            if "_b" in self.cur_tracker:
+                tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
+                tracked_detection.detection.class_id = int(pred[6])
                 tracked_detection.detection.confidence = float(pred[5])
             else:
+                tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
+                tracked_detection.detection.class_id = int(pred[5])
                 tracked_detection.detection.confidence = float(pred[6])
+
+                
 
         output_proto.metrics.CopyFrom(detection_proto.metrics)
         output_proto.metrics.tracking_inference_time_us = inference_time_us
 
-        return output_proto.SerializeToString(), num_cars, inference_time_us, tracking_output
+        return output_proto.SerializeToString(), num_cars
