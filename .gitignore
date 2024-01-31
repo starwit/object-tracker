@@ -9,4 +9,3 @@ cache
 !settings.template.yaml
 *.sh
 **/frames*/
-**/iou.py
