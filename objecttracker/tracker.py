@@ -59,7 +59,7 @@ class Tracker:
             self.config.tracking_params.det_thresh,
         )
 
-    PROTO_DESERIALIZATION_DURATION.time()
+    @PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, detection_proto_raw):
         detection_proto = DetectionOutput()
         detection_proto.ParseFromString(detection_proto_raw)
@@ -81,7 +81,7 @@ class Tracker:
             det_array[idx, 5] = detection.class_id
         return det_array
     
-    PROTO_SERIALIZATION_DURATION.time()
+    @PROTO_SERIALIZATION_DURATION.time()
     def _create_output(self, tracking_output, detection_proto: DetectionOutput, inference_time_us):
         output_proto = TrackingOutput()
         output_proto.frame.CopyFrom(detection_proto.frame)
