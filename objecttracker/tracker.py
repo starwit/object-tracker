@@ -6,12 +6,12 @@ from typing import Any
 
 import numpy as np
 import torch
+from boxmot import OCSORT, DeepOCSORT
 from prometheus_client import Counter, Histogram, Summary
 from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
 from visionlib.pipeline.tools import get_raw_frame_data
 
-from .config import ObjectTrackerConfig
-from .trackingimpl.deepocsort.ocsort import OCSort
+from .config import ObjectTrackerConfig, TrackingAlgorithm
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
@@ -51,13 +51,42 @@ class Tracker:
         return self._create_output(tracking_output_array, detection_proto, inference_time_us)
         
     def _setup(self):
-        logger.info('Setting up object-tracker model...')
-        self.tracker = OCSort(
-            Path(self.config.tracking_params.model_weights), 
-            torch.device(self.config.device), 
-            self.config.tracking_params.fp16, 
-            self.config.tracking_params.det_thresh,
-        )
+        conf = self.config.tracker_config
+        if self.config.tracker_algorithm == TrackingAlgorithm.DEEPOCSORT:
+            self.tracker = DeepOCSORT(
+                model_weights=Path(self.config.tracker_config.model_weights),
+                device=conf.device,
+                fp16=conf.fp16,
+                per_class=conf.per_class,
+                det_thresh=conf.det_thresh,
+                max_age=conf.max_age,
+                min_hits=conf.min_hits,
+                iou_threshold=conf.iou_threshold,
+                delta_t=conf.delta_t,
+                asso_func=conf.asso_func,
+                inertia=conf.inertia,
+                w_association_emb=conf.w_association_emb,
+                alpha_fixed_emb=conf.alpha_fixed_emb,
+                aw_param=conf.aw_param,
+                embedding_off=conf.embedding_off,
+                cmc_off=conf.cmc_off,
+                aw_off=conf.aw_off,
+                new_kf_off=conf.new_kf_off
+            )
+        elif self.config.tracker_algorithm == TrackingAlgorithm.OCSORT:
+            self.tracker = OCSORT(
+                det_thresh=conf.det_thresh,
+                max_age=conf.max_age,
+                min_hits=conf.min_hits,
+                asso_threshold=conf.asso_threshold,
+                delta_t=conf.delta_t,
+                asso_func=conf.asso_func,
+                inertia=conf.inertia,
+                use_byte=conf.use_byte
+            )
+        else:
+            logger.error(f'Unknown tracker algorithm: {self.config.tracker_algorithm}')
+            exit(1)
 
     @PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, detection_proto_raw):
@@ -99,8 +128,8 @@ class Tracker:
 
             tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
 
-            tracked_detection.detection.class_id = int(pred[5])
-            tracked_detection.detection.confidence = float(pred[6])
+            tracked_detection.detection.confidence = float(pred[5])
+            tracked_detection.detection.class_id = int(pred[6])
 
         output_proto.metrics.CopyFrom(detection_proto.metrics)
         output_proto.metrics.tracking_inference_time_us = inference_time_us

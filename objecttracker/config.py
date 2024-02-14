@@ -1,12 +1,42 @@
 from pydantic import BaseModel, conint
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from visionlib.pipeline.settings import LogLevel, YamlConfigSettingsSource
+from enum import Enum
+from typing import Union
 
+class TrackingAlgorithm(str, Enum):
+    DEEPOCSORT = 'DEEPOCSORT'
+    OCSORT = 'OCSORT'
 
 class DeepOcSortConfig(BaseModel):
-    det_thresh: float = 0.25
-    fp16: bool = False
-    model_weights: str = 'osnet_x0_25_msmt17.pt'
+    model_weights: str
+    device: str
+    fp16: bool
+    per_class: bool
+    det_thresh: float
+    max_age: int
+    min_hits: int
+    iou_threshold: float
+    delta_t: int
+    asso_func: str
+    inertia: float
+    w_association_emb: float
+    alpha_fixed_emb: float
+    aw_param: float
+    embedding_off: bool
+    cmc_off: bool
+    aw_off: bool
+    new_kf_off: bool
+
+class OcSortConfig(BaseModel):
+    det_thresh: float
+    max_age: int
+    min_hits: int
+    asso_threshold: float
+    delta_t: int
+    asso_func: str
+    inertia: float
+    use_byte: bool
 
 class RedisConfig(BaseModel):
     host: str = 'localhost'
@@ -17,8 +47,8 @@ class RedisConfig(BaseModel):
 
 class ObjectTrackerConfig(BaseSettings):
     log_level: LogLevel = LogLevel.WARNING
-    tracking_params: DeepOcSortConfig
-    device: str = 'cpu'
+    tracker_config: Union[DeepOcSortConfig, OcSortConfig]
+    tracker_algorithm: TrackingAlgorithm
     redis: RedisConfig
 
     model_config = SettingsConfigDict(env_nested_delimiter='__')

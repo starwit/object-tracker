@@ -50,12 +50,14 @@ if __name__ == '__main__':
     publish = RedisPublisher(CONFIG.redis.host, CONFIG.redis.port)
 
     with consume, publish:
-        for stream_id, proto_data in consume():
+        for stream_key, proto_data in consume():
             if stop_event.is_set():
                 break
             
-            if stream_id is None:
+            if stream_key is None:
                 continue
+
+            stream_id = stream_key.split(':')[1]
 
             FRAME_COUNTER.inc()
 
