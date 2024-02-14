@@ -20,9 +20,7 @@ ENV PATH="${POETRY_HOME}/bin:${PATH}"
 COPY poetry.lock poetry.toml pyproject.toml /code/
 
 WORKDIR /code
-RUN --mount=type=secret,id=GIT_CREDENTIALS,target=/root/.git-credentials \
-    git config --global credential.helper store && \
-    poetry install
+RUN poetry install
     
 # Copy the rest of the project
 COPY . /code/
