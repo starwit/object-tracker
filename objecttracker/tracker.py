@@ -122,10 +122,10 @@ class Tracker:
         
         for pred in tracking_output:
             tracked_detection = output_proto.tracked_detections.add()
-            tracked_detection.detection.bounding_box.min_x = int(pred[0])
-            tracked_detection.detection.bounding_box.min_y = int(pred[1])
-            tracked_detection.detection.bounding_box.max_x = int(pred[2])
-            tracked_detection.detection.bounding_box.max_y = int(pred[3])
+            tracked_detection.detection.bounding_box.min_x = float(pred[0])
+            tracked_detection.detection.bounding_box.min_y = float(pred[1])
+            tracked_detection.detection.bounding_box.max_x = float(pred[2])
+            tracked_detection.detection.bounding_box.max_y = float(pred[3])
 
             tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
 
