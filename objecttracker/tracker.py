@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from boxmot import OCSORT, DeepOCSORT
 from prometheus_client import Counter, Histogram, Summary
-from visionapi.messages_pb2 import DetectionOutput, TrackingOutput
+from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.tools import get_raw_frame_data
 
 from .config import ObjectTrackerConfig, TrackingAlgorithm
@@ -39,17 +39,17 @@ class Tracker:
     @torch.no_grad()
     def get(self, input_proto):        
 
-        input_image, detection_proto = self._unpack_proto(input_proto)
+        input_image, sae_msg = self._unpack_proto(input_proto)
         
         inference_start = time.monotonic_ns()
-        det_array = self._prepare_detection_input(detection_proto)
+        det_array = self._prepare_detection_input(sae_msg)
         with MODEL_DURATION.time():
             tracking_output_array = self.tracker.update(det_array, input_image)
 
         OBJECT_COUNTER.inc(len(tracking_output_array))
         
         inference_time_us = (time.monotonic_ns() - inference_start) // 1000
-        return self._create_output(tracking_output_array, detection_proto, inference_time_us)
+        return self._create_output(tracking_output_array, sae_msg, inference_time_us)
         
     def _setup(self):
         conf = self.config.tracker_config
@@ -90,18 +90,18 @@ class Tracker:
             exit(1)
 
     @PROTO_DESERIALIZATION_DURATION.time()
-    def _unpack_proto(self, detection_proto_raw):
-        detection_proto = DetectionOutput()
-        detection_proto.ParseFromString(detection_proto_raw)
+    def _unpack_proto(self, sae_message_bytes):
+        sae_msg = SaeMessage()
+        sae_msg.ParseFromString(sae_message_bytes)
 
-        input_frame = detection_proto.frame
+        input_frame = sae_msg.frame
         input_image = get_raw_frame_data(input_frame)
 
-        return input_image, detection_proto
+        return input_image, sae_msg
     
-    def _prepare_detection_input(self, detection_proto: DetectionOutput):
-        det_array = np.zeros((len(detection_proto.detections), 6))
-        for idx, detection in enumerate(detection_proto.detections):
+    def _prepare_detection_input(self, sae_msg: SaeMessage):
+        det_array = np.zeros((len(sae_msg.detections), 6))
+        for idx, detection in enumerate(sae_msg.detections):
             det_array[idx, 0] = detection.bounding_box.min_x
             det_array[idx, 1] = detection.bounding_box.min_y
             det_array[idx, 2] = detection.bounding_box.max_x
@@ -112,27 +112,27 @@ class Tracker:
         return det_array
     
     @PROTO_SERIALIZATION_DURATION.time()
-    def _create_output(self, tracking_output, detection_proto: DetectionOutput, inference_time_us):
-        output_proto = TrackingOutput()
-        output_proto.frame.CopyFrom(detection_proto.frame)
+    def _create_output(self, tracking_output, input_sae_msg: SaeMessage, inference_time_us):
+        output_sae_msg = SaeMessage()
+        output_sae_msg.frame.CopyFrom(input_sae_msg.frame)
 
         # The length of detections and tracking_output can be different 
         # (as the latter only includes objects that could be matched to an id)
         # Therefore, we can only reuse the VideoFrame and have to recreate everything else
         
         for pred in tracking_output:
-            tracked_detection = output_proto.tracked_detections.add()
-            tracked_detection.detection.bounding_box.min_x = float(pred[0])
-            tracked_detection.detection.bounding_box.min_y = float(pred[1])
-            tracked_detection.detection.bounding_box.max_x = float(pred[2])
-            tracked_detection.detection.bounding_box.max_y = float(pred[3])
+            detection = output_sae_msg.detections.add()
+            detection.bounding_box.min_x = float(pred[0])
+            detection.bounding_box.min_y = float(pred[1])
+            detection.bounding_box.max_x = float(pred[2])
+            detection.bounding_box.max_y = float(pred[3])
 
-            tracked_detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
+            detection.object_id = uuid.uuid3(self.object_id_seed, str(int(pred[4]))).bytes
 
-            tracked_detection.detection.confidence = float(pred[5])
-            tracked_detection.detection.class_id = int(pred[6])
+            detection.confidence = float(pred[5])
+            detection.class_id = int(pred[6])
 
-        output_proto.metrics.CopyFrom(detection_proto.metrics)
-        output_proto.metrics.tracking_inference_time_us = inference_time_us
+        output_sae_msg.metrics.CopyFrom(input_sae_msg.metrics)
+        output_sae_msg.metrics.tracking_inference_time_us = inference_time_us
         
-        return output_proto.SerializeToString()
+        return output_sae_msg.SerializeToString()

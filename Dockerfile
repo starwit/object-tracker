@@ -37,4 +37,4 @@ RUN apt update && apt install --no-install-recommends -y \
 COPY --from=build /code /code
 WORKDIR /code
 ENV PATH="/code/.venv/bin:$PATH"
-CMD [ "python", "run_stage.py" ]
+CMD [ "python", "main.py" ]
