@@ -58,13 +58,13 @@ class Tracker:
 
     def _setup(self):
 
-        if self.cur_tracker == "ocsort_b":
+        if self.cur_tracker == "ocsort":
             logger.info('Setting up object-tracker Boxmot: OCSort')
 
             from .trackingimpl.boxmot.trackers.ocsort.ocsort import OCSort
             self.tracker = OCSort()
 
-        elif self.cur_tracker == "botsort_b":
+        elif self.cur_tracker == "botsort":
             logger.info('Setting up object-tracker Boxmot: BotSort')
 
             from .trackingimpl.boxmot.trackers.botsort.bot_sort import BoTSORT
@@ -74,7 +74,7 @@ class Tracker:
                 self.config.tracking_params.fp16
             )
 
-        elif self.cur_tracker == "bytetrack_b":
+        elif self.cur_tracker == "bytetrack":
             logger.info('Setting up object-tracker Boxmot: Bytetrack')
 
             from .trackingimpl.boxmot.trackers.bytetrack.byte_tracker import BYTETracker
@@ -82,7 +82,7 @@ class Tracker:
                 frame_rate=5
             )
 
-        elif self.cur_tracker == "deepocsort_b":
+        elif self.cur_tracker == "deepocsort":
             logger.info('Setting up object-tracker Boxmot: DeepOCSort')
 
             from .trackingimpl.boxmot.trackers.deepocsort.deep_ocsort import DeepOCSort
@@ -92,16 +92,6 @@ class Tracker:
                 self.config.tracking_params.fp16
             )
 
-        elif self.cur_tracker == "deepocsort_og":
-            logger.info('Setting up object-tracker DeepOCSort')
-
-            from .trackingimpl.deepocsort.ocsort import OCSort
-            self.tracker = OCSort(
-                Path(self.config.tracking_params.model_weights),
-                torch.device(self.config.device),
-                self.config.tracking_params.fp16,
-                self.config.tracking_params.det_thresh,
-            )
 
     PROTO_DESERIALIZATION_DURATION.time()
 
