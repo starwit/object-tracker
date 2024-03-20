@@ -19,7 +19,7 @@ filterpy = "^1.4.5"
 redis = "^5.0.0"
 pydantic-settings = "^2.0.3"
 prometheus-client = "^0.17.1"
-# boxmot = { git = "https://github.com/starwit/yolo_tracking.git", branch = "memory-overflow-fix" }
+boxmot = { git = "https://github.com/starwit/yolo_tracking.git", branch = "memory-overflow-fix" }
 
 [build-system]
 requires = ["poetry-core"]
