@@ -50,6 +50,7 @@ class ObjectTrackerConfig(BaseSettings):
     tracker_config: Union[DeepOcSortConfig, OcSortConfig]
     tracker_algorithm: TrackingAlgorithm
     redis: RedisConfig
+    prometheus_port: conint(gt=1024, le=65536) = 8000
 
     model_config = SettingsConfigDict(env_nested_delimiter='__')
 
