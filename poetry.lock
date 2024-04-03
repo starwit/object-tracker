@@ -45,13 +45,13 @@ lxml = ["lxml"]
 
 [[package]]
 name = "boxmot"
-version = "10.0.62"
+version = "10.0.64"
 description = "BoxMOT: pluggable SOTA tracking modules for segmentation, object detection and pose estimation models"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "boxmot-10.0.62-py3-none-any.whl", hash = "sha256:89a492525ce3ab26796fb3359c560fa4f634f28ecd1d111637b6e69019c3b4c1"},
-    {file = "boxmot-10.0.62.tar.gz", hash = "sha256:9df4ffabddc7251b9b8bc31f53c6feec9ecc785489db5c039112a418569b50d7"},
+    {file = "boxmot-10.0.64-py3-none-any.whl", hash = "sha256:4d073b5acb48facebcc10ec8e0c74383b43e6ba029c86b8eafb85d6da3ddc27f"},
+    {file = "boxmot-10.0.64.tar.gz", hash = "sha256:052d34e45096966089c170249271ad3ebffa2abc99351a2c15ca7ac574b61737"},
 ]
 
 [package.dependencies]
@@ -2344,4 +2344,4 @@ PyYAML = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e5c755c839aefcc337d545cb4a4bd8637bb541efa6914a191f1723b0abf42c90"
+content-hash = "29025aea476a37128301814a5248f53693074b23f9bf3b851c557d96a4d6c644"
