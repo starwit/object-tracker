@@ -44,12 +44,12 @@ class Tracker:
         inference_start = time.monotonic_ns()
         det_array = self._prepare_detection_input(sae_msg)
         with MODEL_DURATION.time():
-            tracking_output_array = self.tracker.update(det_array, input_image)
+            tracking_output_array, trks = self.tracker.update(det_array, input_image)
 
         OBJECT_COUNTER.inc(len(tracking_output_array))
         
         inference_time_us = (time.monotonic_ns() - inference_start) // 1000
-        return self._create_output(tracking_output_array, sae_msg, inference_time_us)
+        return self._create_output(tracking_output_array, sae_msg, inference_time_us, trks)
         
     def _setup(self):
         conf = self.config.tracker_config
@@ -112,7 +112,7 @@ class Tracker:
         return det_array
     
     @PROTO_SERIALIZATION_DURATION.time()
-    def _create_output(self, tracking_output, input_sae_msg: SaeMessage, inference_time_us):
+    def _create_output(self, tracking_output, input_sae_msg: SaeMessage, inference_time_us, trks):
         output_sae_msg = SaeMessage()
         output_sae_msg.frame.CopyFrom(input_sae_msg.frame)
 
@@ -135,4 +135,4 @@ class Tracker:
         output_sae_msg.metrics.CopyFrom(input_sae_msg.metrics)
         output_sae_msg.metrics.tracking_inference_time_us = inference_time_us
         
-        return output_sae_msg.SerializeToString()
+        return output_sae_msg.SerializeToString(), trks
