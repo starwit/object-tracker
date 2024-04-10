@@ -19,7 +19,7 @@ filterpy = "^1.4.5"
 redis = "^5.0.0"
 pydantic-settings = "^2.0.3"
 prometheus-client = "^0.17.1"
-boxmot = "10.0.64"
+boxmot = { path = "/home/edgar/Documents/Arbeit/Tracker_Project/yolo_tracking", develop = true }
 
 [build-system]
 requires = ["poetry-core"]
