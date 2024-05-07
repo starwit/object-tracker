@@ -12,6 +12,7 @@ numpy = "^1.24.0"
 pydantic = "^2.0.0"
 visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "2.0.1" }
 visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.9.0" }
+boxmot = {git = "https://github.com/starwit/yolo_tracking.git", branch = "tracker-improvements" }
 opencv-python = "^4.7.0.72"
 torch = "^2.2.1"
 torchvision = "^0.17.1"
@@ -19,7 +20,7 @@ filterpy = "^1.4.5"
 redis = "^5.0.0"
 pydantic-settings = "^2.0.3"
 prometheus-client = "^0.17.1"
-boxmot = { path = "/home/edgar/Documents/Arbeit/Tracker_Project/yolo_tracking", develop = true }
+# boxmot = { path = "/home/edgar/Documents/Arbeit/Tracker_Project/yolo_tracking", develop = true }
 
 [build-system]
 requires = ["poetry-core"]
