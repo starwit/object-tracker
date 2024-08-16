@@ -83,7 +83,9 @@ class Tracker:
                 delta_t=conf.delta_t,
                 asso_func=conf.asso_func,
                 inertia=conf.inertia,
-                use_byte=conf.use_byte
+                use_byte=conf.use_byte,
+                Q_xy_scaling=conf.Q_xy_scaling,
+                Q_s_scaling=conf.Q_s_scaling,
             )
         else:
             logger.error(f'Unknown tracker algorithm: {self.config.tracker_algorithm}')

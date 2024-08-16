@@ -1,8 +1,11 @@
-from pydantic import BaseModel, conint
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from visionlib.pipeline.settings import LogLevel, YamlConfigSettingsSource
 from enum import Enum
 from typing import Union
+
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing_extensions import Annotated
+from visionlib.pipeline.settings import LogLevel, YamlConfigSettingsSource
+
 
 class TrackingAlgorithm(str, Enum):
     DEEPOCSORT = 'DEEPOCSORT'
@@ -29,28 +32,30 @@ class DeepOcSortConfig(BaseModel):
     new_kf_off: bool
 
 class OcSortConfig(BaseModel):
-    det_thresh: float
-    max_age: int
-    min_hits: int
-    asso_threshold: float
-    delta_t: int
-    asso_func: str
-    inertia: float
-    use_byte: bool
+    det_thresh: float = 0.2
+    max_age: int = 30
+    min_hits: int = 3
+    asso_threshold: float = 0.3
+    delta_t: int = 3
+    asso_func: str = 'iou'
+    inertia: float = 0.2
+    use_byte: bool = False
+    Q_xy_scaling: float = 0.01
+    Q_s_scaling: float = 0.0001
 
 class RedisConfig(BaseModel):
     host: str = 'localhost'
-    port: conint(ge=1, le=65536) = 6379
+    port: Annotated[int, Field(ge=1, le=65536)] = 6379
     stream_id: str
     input_stream_prefix: str = 'objectdetector'
     output_stream_prefix: str = 'objecttracker'
 
 class ObjectTrackerConfig(BaseSettings):
     log_level: LogLevel = LogLevel.WARNING
-    tracker_config: Union[DeepOcSortConfig, OcSortConfig]
-    tracker_algorithm: TrackingAlgorithm
+    tracker_config: Union[DeepOcSortConfig, OcSortConfig] = OcSortConfig()
+    tracker_algorithm: TrackingAlgorithm = TrackingAlgorithm.OCSORT
     redis: RedisConfig
-    prometheus_port: conint(gt=1024, le=65536) = 8000
+    prometheus_port: Annotated[int, Field(gt=1024, le=65536)] = 8000
 
     model_config = SettingsConfigDict(env_nested_delimiter='__')
 
