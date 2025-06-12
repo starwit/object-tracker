@@ -1,0 +1,29 @@
+#!/bin/bash
+set -e
+
+if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
+
+    # Stop the service
+    systemctl stop objecttracker.service
+
+    # Disable the service
+    systemctl disable objecttracker.service
+
+    # Remove the service file
+    rm -f /etc/systemd/system/objecttracker.service
+
+    systemctl daemon-reload
+
+    # Remove the wrapper script
+    rm -f /usr/local/bin/objecttracker
+    
+    # Remove application directory
+    rm -rf /opt/starwit/objecttracker
+
+    # Remove config files directory
+    rm -rf /etc/starwit/objecttracker
+fi
+
+#DEBHELPER#
+
+exit 0

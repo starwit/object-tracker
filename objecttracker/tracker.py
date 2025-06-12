@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 import torch
-from boxmot import OCSORT, DeepOCSORT
+from boxmot import OcSort, DeepOcSort
 from prometheus_client import Counter, Histogram, Summary
 from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.tools import get_raw_frame_data
@@ -54,7 +54,7 @@ class Tracker:
     def _setup(self):
         conf = self.config.tracker_config
         if self.config.tracker_algorithm == TrackingAlgorithm.DEEPOCSORT:
-            self.tracker = DeepOCSORT(
+            self.tracker = DeepOcSort(
                 model_weights=Path(self.config.tracker_config.model_weights),
                 device=conf.device,
                 fp16=conf.fp16,
@@ -75,7 +75,7 @@ class Tracker:
                 new_kf_off=conf.new_kf_off
             )
         elif self.config.tracker_algorithm == TrackingAlgorithm.OCSORT:
-            self.tracker = OCSORT(
+            self.tracker = OcSort(
                 det_thresh=conf.det_thresh,
                 max_age=conf.max_age,
                 min_hits=conf.min_hits,
