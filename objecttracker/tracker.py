@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from boxmot import OcSort, DeepOcSort
 from prometheus_client import Counter, Histogram, Summary
-from visionapi.messages_pb2 import SaeMessage
+from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.tools import get_raw_frame_data
 
 from .config import ObjectTrackerConfig, TrackingAlgorithm
