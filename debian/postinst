@@ -24,7 +24,7 @@ if [ "$1" = "configure" ]; then
     pip3 install git+https://github.com/starwit/vision-api.git@3.2.0#subdirectory=python/visionapi
     pip3 install git+https://github.com/starwit/vision-lib.git@0.11.2#subdirectory=python
 
-    pip3 install boxmot filterpy
+    pip3 install boxmot==13.0.8 filterpy
 
     echo "Create wrapper script"
     mkdir -p /usr/local/bin
