@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+export PYBUILD_NAME=objecttracker
+export PYBUILD_DISABLE=test
+export DH_VERBOSE=1
+
+# Skip the build step and handle it manually
+override_dh_auto_build:
+	# Skip the automatic build
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_install:
+	dh_auto_install
+	# Install the objecttracker package to the correct location
+	mkdir -p debian/objecttracker/usr/lib/python3/dist-packages/
+	cp -r objecttracker debian/objecttracker/usr/lib/python3/dist-packages/
+
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
+
+# Let dh_python3 handle dependencies
+# override_dh_python3:
+# 	:

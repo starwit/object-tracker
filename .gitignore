@@ -8,3 +8,5 @@ cache
 .vscode
 *.yaml
 !settings.template.yaml
+target
+dist

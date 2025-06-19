@@ -1,0 +1,19 @@
+Source: objecttracker
+Section: python
+Priority: optional
+Maintainer: Florian Stanek <foss@starwit.de>
+Build-Depends: debhelper (>= 11), dh-python, python3-all (>= 3.10), python3-setuptools, python3-pip
+Standards-Version: 4.1.3
+Homepage: https://starwit.de
+
+Package: objecttracker
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, python3 (>= 3.10), python3 (<< 3.13), 
+          python3-pydantic, python3-opencv, 
+          python3-redis, python3-prometheus-client, 
+          libturbojpeg, python3-pip, git,
+          libcusparselt0, libcusparselt-dev
+XB-Python-Version: ${python:Versions}
+Description: Object Tracker Component
+ Part of Starwit's Awareness Engine. This component takes care of 
+ tracking objects in consecutive video frames.

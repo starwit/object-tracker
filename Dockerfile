@@ -1,4 +1,4 @@
-FROM python:3.10-slim as build
+FROM python:3.12-slim AS build
 
 ADD "https://drive.google.com/uc?id=1Kkx2zW89jq_NETu4u42CFZTMVD5Hwm6e" /code/osnet_x0_25_msmt17.pt
 
@@ -24,7 +24,7 @@ COPY . /code/
 
 ### Main artifact / deliverable image
 
-FROM python:3.10-slim
+FROM python:3.12-slim
 RUN apt update && apt install --no-install-recommends -y \
     libglib2.0-0 \
     libgl1 \

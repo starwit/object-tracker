@@ -1,14 +1,13 @@
 import logging
 import time
 import uuid
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
-from boxmot import OCSORT, DeepOCSORT
+from boxmot import OcSort
 from prometheus_client import Counter, Histogram, Summary
-from visionapi.messages_pb2 import SaeMessage
+from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.tools import get_raw_frame_data
 
 from .config import ObjectTrackerConfig, TrackingAlgorithm
@@ -53,29 +52,8 @@ class Tracker:
         
     def _setup(self):
         conf = self.config.tracker_config
-        if self.config.tracker_algorithm == TrackingAlgorithm.DEEPOCSORT:
-            self.tracker = DeepOCSORT(
-                model_weights=Path(self.config.tracker_config.model_weights),
-                device=conf.device,
-                fp16=conf.fp16,
-                per_class=conf.per_class,
-                det_thresh=conf.det_thresh,
-                max_age=conf.max_age,
-                min_hits=conf.min_hits,
-                iou_threshold=conf.iou_threshold,
-                delta_t=conf.delta_t,
-                asso_func=conf.asso_func,
-                inertia=conf.inertia,
-                w_association_emb=conf.w_association_emb,
-                alpha_fixed_emb=conf.alpha_fixed_emb,
-                aw_param=conf.aw_param,
-                embedding_off=conf.embedding_off,
-                cmc_off=conf.cmc_off,
-                aw_off=conf.aw_off,
-                new_kf_off=conf.new_kf_off
-            )
-        elif self.config.tracker_algorithm == TrackingAlgorithm.OCSORT:
-            self.tracker = OCSORT(
+        if self.config.tracker_algorithm == TrackingAlgorithm.OCSORT:
+            self.tracker = OcSort(
                 det_thresh=conf.det_thresh,
                 max_age=conf.max_age,
                 min_hits=conf.min_hits,

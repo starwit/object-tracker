@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p /etc/starwit/objecttracker
+mkdir -p /opt/starwit/objecttracker
