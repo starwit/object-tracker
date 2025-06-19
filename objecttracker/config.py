@@ -8,7 +8,6 @@ from visionlib.pipeline.settings import LogLevel, YamlConfigSettingsSource
 
 
 class TrackingAlgorithm(str, Enum):
-    DEEPOCSORT = 'DEEPOCSORT'
     OCSORT = 'OCSORT'
 
 class DeepOcSortConfig(BaseModel):
