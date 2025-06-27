@@ -5,7 +5,22 @@
 
 version: 2
 updates:
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    target-branch: main
+    schedule:
+      interval: "weekly"
+    groups:
+      docker-deps:
+        patterns:
+          - "*"
+
   - package-ecosystem: "poetry" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      "pip":
+        patterns:
+          - "*"
