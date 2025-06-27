@@ -9,8 +9,6 @@ check-settings:
 	./check_settings.sh
 
 build-deb: check-settings
-	poetry lock
-	poetry build
 	dpkg-buildpackage -us -uc
 	mkdir -p target
 	mv ../${PACKAGE_NAME}_* target/
