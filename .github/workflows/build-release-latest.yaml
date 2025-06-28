@@ -1,8 +1,8 @@
-name: PR build
+name: Build and release latest APT package
 
 on:
   workflow_dispatch:
-  #pull_request:
+  pull_request:
 
 permissions:
   contents: write
@@ -22,15 +22,16 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: build apt package
+      - name: build package
         run: |
-            echo "Build APT package"
             export PATH=/root/.local/bin/:$PATH
             bash -c ./start_make.sh
             echo "VERSION=$(poetry version -s)" >> $GITHUB_ENV
-            echo "Finish building APT package"
-      - name: test poetry builds
+            echo "Done building APT package"
+      - name: create release
         run: |
-            export PATH=/root/.local/bin/:$PATH
-            #poetry install
-            #poetry build
+          cd /code
+          echo "Releasing package with version ${VERSION}"
+          gh release create ${VERSION} --title "${VERSION}" ./target/*deb ./target/*.dsc
+        env:
+          GH_TOKEN: ${{ github.token }}
