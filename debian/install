@@ -1,4 +1,7 @@
 settings.yaml /etc/starwit/objecttracker
 main.py /opt/starwit/objecttracker
 
+debian/requirements.txt /opt/starwit/objecttracker
+objecttracker /opt/starwit/objecttracker
+
 debian/objecttracker.service /usr/lib/systemd/system/

@@ -9,8 +9,11 @@ if [ "$1" = "configure" ]; then
     cd "/opt/starwit/objecttracker"
     virtualenv --system-site-packages .venv
     source .venv/bin/activate
-
-    pip3 install boxmot==13.0.8 --no-deps
+    
+    python -m pip install --upgrade setuptools wheel twine check-wheel-contents
+    pip install boxmot==13.0.8 --no-deps
+    
+    pip install -r requirements.txt
 
     echo "Create wrapper script"
     mkdir -p /usr/local/bin
