@@ -7,12 +7,12 @@ if [ "$1" = "configure" ]; then
     export PATH=/root/.local/bin:$PATH
     echo "Create virtual environment for application"
     cd "/opt/starwit/objecttracker"
-    virtualenv --system-site-packages .venv
+    python3 -m venv .venv
     source .venv/bin/activate
     
     python -m pip install --upgrade setuptools wheel twine check-wheel-contents
-    pip install boxmot==13.0.8 --no-deps
-    
+    #pip install boxmot==13.0.8 --no-deps
+
     pip install -r requirements.txt
 
     echo "Create wrapper script"
