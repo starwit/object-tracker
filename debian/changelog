@@ -1,3 +1,9 @@
+objecttracker (###RELEASE_VERSION###) unstable; urgency=medium
+
+  * Virtual environments
+
+ -- Florian Stanek <foss@starwit.de>  Sun, 21 Jul 2025 00:00:00 +0000
+
 objecttracker (3.1.0) unstable; urgency=medium
 
   * Initial release.

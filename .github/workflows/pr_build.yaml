@@ -12,7 +12,7 @@ jobs:
     name: package APT
     runs-on: [self-hosted, linux, X64]
     container:
-        image: starwitorg/debian-packaging:0.0.2
+        image: starwitorg/debian-packaging:0.0.3
         env:
           PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD_FLAT }}
           GPG_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY_B64 }}          
@@ -25,12 +25,10 @@ jobs:
       - name: build apt package
         run: |
             echo "Build APT package"
-            export PATH=/root/.local/bin/:$PATH
             bash -c ./start_make.sh
             echo "VERSION=$(poetry version -s)" >> $GITHUB_ENV
             echo "Finish building APT package"
-      - name: test poetry builds
+      - name: test poetry builds & tests
         run: |
-            export PATH=/root/.local/bin/:$PATH
             #poetry install
             #poetry build
