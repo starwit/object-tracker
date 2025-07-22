@@ -15,9 +15,9 @@ visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = 
 opencv-python = "^4.7.0.72"
 filterpy = "^1.4.5"
 redis = "^5.0.0"
-pydantic-settings = "^2.0.3"
-prometheus-client = "^0.17.1"
-boxmot = "13.0.8"
+pydantic-settings = "^2.10.1"
+prometheus-client = "^0.22.1"
+boxmot = "13.0.17"
 
 [build-system]
 requires = ["poetry-core"]
