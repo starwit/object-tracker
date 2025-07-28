@@ -30,7 +30,7 @@ jobs:
 
     - name: build and push docker
       run: |
-        echo "DOCKER_VERSION=$(cat pyproject.toml | grep "version" | cut -d'=' -f2 | xargs echo -n)"  >> $GITHUB_ENV
+        echo "DOCKER_VERSION=$(cat pyproject.toml | grep "version" | head -1 | cut -d'=' -f2 | xargs echo -n)"  >> $GITHUB_ENV
 
     - name: Build and push
       uses: docker/build-push-action@v5

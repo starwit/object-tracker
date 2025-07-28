@@ -1,14 +1,42 @@
 name: PR build
 
 on:
-  workflow_dispatch:
   pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  pr-build-poetry:
+    name: PR Build with Poetry
+    runs-on: [self-hosted, linux, X64]
+    container:
+        image: starwitorg/base-python-image:0.0.15
+        volumes:
+            - /home/githubrunner/.cache/pypoetry:/root/.cache/pypoetry
+    steps:
+      #----------------------------------------------
+      #       check-out repo and set-up python
+      #----------------------------------------------
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup
+        run: |
+          python --version
+          poetry --version
+
+      #----------------------------------------------
+      # install your root project, if required
+      #----------------------------------------------
+      - name: Install project
+        run: |
+          poetry config cache-dir /root/.cache/pypoetry
+          bash -c "make test"
+
+  apt-build:
     name: package APT
     runs-on: [self-hosted, linux, X64]
     container:
@@ -16,8 +44,6 @@ jobs:
         env:
           PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD_FLAT }}
           GPG_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY_B64 }}          
-        volumes:
-            - ./:/code
 
     steps:
       - name: checkout
@@ -25,10 +51,5 @@ jobs:
       - name: build apt package
         run: |
             echo "Build APT package"
-            bash -c ./start_make.sh
-            echo "VERSION=$(poetry version -s)" >> $GITHUB_ENV
+            bash -c "poetry self add poetry-plugin-export; make build-deb"
             echo "Finish building APT package"
-      - name: test poetry builds & tests
-        run: |
-            #poetry install
-            #poetry build
