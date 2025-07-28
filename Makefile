@@ -2,8 +2,11 @@
 
 export PACKAGE_NAME=objecttracker
 
-install:
+install: check-settings
 	poetry install
+
+test: install
+	poetry run pytest
 
 check-settings:
 	./check_settings.sh
