@@ -6,6 +6,6 @@ def test_tracker_import():
     except ImportError as e:
         pytest.fail(f"Failed to import ObjectTracker: {e}")
 
-    assert ObjectTracker is not None, "ObjectTracker should be imported successfully"
+    assert Tracker is not None, "ObjectTracker should be imported successfully"
         
         
