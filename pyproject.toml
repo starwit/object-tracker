@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "objecttracker"
-version = "3.2.1"
+version = "3.2.3"
 description = ""
 authors = ["flonix8 <flstanek@googlemail.com>"]
 license = "AGPLv3"
@@ -18,7 +18,11 @@ redis = "^5.0.0"
 pydantic-settings = "^2.0.3"
 prometheus-client = "^0.17.1"
 boxmot = "13.0.8"
+pytest = "8.4.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "8.4.1"
