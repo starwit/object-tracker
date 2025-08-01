@@ -21,14 +21,12 @@ RUN apt update && apt install --no-install-recommends -y \
     libgl1 \
     libturbojpeg0
 
-COPY --from=build /code /code
-WORKDIR /code
-
 # Create a non-root user and group
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
-# Change ownership of the files to the non-root user
-RUN chown -R appuser:appgroup /code
+COPY --from=build --chown=appuser:appgroup /code /code
+
+WORKDIR /code
 
 # Switch to non-root user
 USER appuser
