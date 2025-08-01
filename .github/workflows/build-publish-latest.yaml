@@ -1,4 +1,4 @@
-name: Build and release latest APT package
+name: Build and release latest
 
 on:
   workflow_dispatch:
