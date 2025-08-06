@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t starwitorg/sae-object-tracker:$(poetry version --short) .
+docker build -t starwitorg/sae-object-tracker:$(git rev-parse --short HEAD) .

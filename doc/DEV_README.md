@@ -3,7 +3,7 @@ This section contains all information about how to build & run object tracker fo
 
 ## Docker
 
-You can use [docker_build.sh](docker_build.sh) and [docker_publish.sh](docker_publish.sh) to build and publish Docker images. 
+You can use [docker_build.sh](docker_build.sh) to build an image for local testing.
 
 Once build you can run Docker image locally like so:
 ```bash
