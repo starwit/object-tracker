@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from boxmot import OcSort
 from prometheus_client import Counter, Histogram, Summary
+from visionapi.common_pb2 import MessageType
 from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.tools import get_raw_frame_data
 
@@ -114,5 +115,7 @@ class Tracker:
 
         output_sae_msg.metrics.CopyFrom(input_sae_msg.metrics)
         output_sae_msg.metrics.tracking_inference_time_us = inference_time_us
+
+        output_sae_msg.type = MessageType.SAE
         
         return output_sae_msg.SerializeToString()
