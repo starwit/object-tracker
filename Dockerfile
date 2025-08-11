@@ -15,7 +15,7 @@ COPY . /code/
 
 ### Main artifact / deliverable image
 
-FROM python:3.12-slim
+FROM python:3.13-slim
 RUN apt update && apt install --no-install-recommends -y \
     libglib2.0-0 \
     libgl1 \
